@@ -1,0 +1,26 @@
+[{
+    "site": "https://www.doordash.com/store/bruegger's-bagels-durham-250810",
+    "address": "800 Taylor St STE 300, Durham, NC 27701",
+    "items": [
+      {
+        "name": "Baker's Dozen",
+        "options": { "Sliced Choice": "Sliced" },
+        "quantity": 4
+      },
+      {
+        "name": "Cream Cheese Tubs",
+        "options": { "Cream Cheese Choice": "Plain" },
+        "quantity": 1
+      },
+      {
+        "name": "Cream Cheese Tubs",
+        "options": { "Cream Cheese Choice": "Onion & Chive" },
+        "quantity": 1
+      },
+      {
+        "name": "Cream Cheese Tubs",
+        "options": { "Cream Cheese Choice": "Strawberry" },
+        "quantity": 1
+      }
+    ]
+}]
