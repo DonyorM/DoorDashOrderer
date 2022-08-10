@@ -1,2 +1,5 @@
 py-env/
 py-env/**/*
+
+.DS_STORE
+./**/DS_STORE
