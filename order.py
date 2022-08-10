@@ -105,6 +105,11 @@ def try_clear_menu_button(text):
     except selenium.common.exceptions.TimeoutException:
         pass
 
+def clear_cart(driver):
+    buttons = driver.find_elements(By.XPATH, '//button[@data-anchor-id="RemoveOrderCartItemButton"]')
+    for button in buttons:
+        click_item(button)
+
 def run_order(driver, order):
     driver.get(order["site"])
 
@@ -116,11 +121,12 @@ def run_order(driver, order):
     
     try_clear_menu_button("View Menu")
 
+    clear_cart(driver)
+
     for item in order['items']:
         orderItem(driver, item['name'], item['options'], item['quantity'])
 
     checkout(driver, shouldOrder=True)
-
 
 chrome_options = Options() 
 chrome_options.add_argument(f'--user-data-dir={os.path.expanduser("~")}/Library/Application Support/Google/Chrome/BagelOrder')
