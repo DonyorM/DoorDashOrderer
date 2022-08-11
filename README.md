@@ -24,7 +24,7 @@ Orders are defined in the `order.json` file in the same directory as the `order.
       },
       ...repeated for as many items as needed
     ]
-}]
+}
 ```
 
 Day string and time range are based on Grub Hub's UI, which results in some odd choices. You can generally only order out about 4 days from the current day, and it uses abbreviations. For example, tomorrow is listed as `TMR`. Times also depend on the options and must include the full string, so one needs too use `8:30 - 8:50 AM` rather than just `8:30 AM`
@@ -73,7 +73,7 @@ If the program pauses mid process it may be because a string is incorrect. Check
 
 ### Refusing to Start
 
-The Chrome instance launched by this tool must be closed befoore a new instance of the script is run, or it will fail. If the script fails to start double check that the Selenium Chrome instance is closed
+The Chrome instance launched by this tool must be closed before a new instance of the script is run, or it will fail. If the script fails to start double check that the Selenium Chrome instance is closed
 
 ### Installation Failed
 
