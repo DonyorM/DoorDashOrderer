@@ -3,3 +3,7 @@ py-env/**/*
 
 .DS_STORE
 ./**/DS_STORE
+
+build/
+dist/
+.eggs/

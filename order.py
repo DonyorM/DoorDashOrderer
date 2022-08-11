@@ -1,5 +1,6 @@
+from multiprocessing import context
 from random import shuffle
-from time import sleep
+from time import sleep, time
 from requests import options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
@@ -10,12 +11,23 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 import selenium
 import os
+import os.path
 import sys
 import tkinter.messagebox
 import json
 
 TIMEOUT_WAIT = 10
 ORDER_FILE_NAME = "order.json"
+APP_FOLDER = "."
+
+pathToApp = __file__
+while not pathToApp.endswith('.app'):
+    if pathToApp == "/":
+        break
+    pathToApp = os.path.dirname(pathToApp)
+
+if pathToApp != "/":
+    APP_FOLDER = os.path.dirname(pathToApp)
 
 def click_item(item):
     for x in range(3):
@@ -28,7 +40,7 @@ def click_item(item):
             driver.execute_script("arguments[0].click();", item)
             return
 
-def find_button_with_text(text):
+def find_button_with_text(driver, text):
     return WebDriverWait(driver, timeout=TIMEOUT_WAIT).until(lambda d: d.find_element(By.XPATH,f'//button[.//*[text()="{text}"]]'))
 
 def orderItem(driver, item_name, options={}, quantity=1):
@@ -61,7 +73,7 @@ def checkout(driver, shouldOrder):
 
     if shouldOrder:
         place_order_button = WebDriverWait(driver, timeout=TIMEOUT_WAIT).until(lambda d: d.find_element(By.XPATH,f'//button[.//*[text()="Place Order"]]'))
-        # TODO actually order
+        click_item(place_order_button)
         # TODO quit after seeing confirmation page
         # driver.quit()
 
@@ -93,7 +105,7 @@ def set_address(driver, address):
     sleep(0.5)
     address_bar.send_keys(Keys.ENTER)
 
-    save_button = find_button_with_text("Save")
+    save_button = find_button_with_text(driver, "Save")
     click_item(save_button)
 
     WebDriverWait(driver, timeout=TIMEOUT_WAIT).until_not(lambda d: d.find_element(By.XPATH, '//div[@data-testid="AddressEditForm"]'))
@@ -110,6 +122,20 @@ def clear_cart(driver):
     for button in buttons:
         click_item(button)
 
+def set_time(driver, day_string, time_string):
+    time_button = driver.find_element(By.XPATH, '//button[@aria-controls="layout-time-picker"]')
+    click_item(time_button)
+
+    day_button = WebDriverWait(driver, timeout=TIMEOUT_WAIT).until(lambda d: d.find_element(By.XPATH,f'//button[.//*[text()="{day_string}"]]'))
+    click_item(day_button)
+
+    time_string = time_string.replace('-', '–')
+    time_string = time_string.replace(' ', ' ')
+    hour_button = WebDriverWait(driver, timeout=TIMEOUT_WAIT).until(lambda d: find_button_with_text(d, time_string))
+    click_item(hour_button)
+
+    WebDriverWait(driver, timeout=TIMEOUT_WAIT).until_not(lambda d: d.find_element(By.ID, "layout-time-picker"))
+
 def run_order(driver, order):
     driver.get(order["site"])
 
@@ -118,6 +144,7 @@ def run_order(driver, order):
 
     checkLogin(driver)
     set_address(driver, order['address'])
+    set_time(driver, order["day"], order["time"])
     
     try_clear_menu_button("View Menu")
 
@@ -128,16 +155,26 @@ def run_order(driver, order):
 
     checkout(driver, shouldOrder=True)
 
-chrome_options = Options() 
-chrome_options.add_argument(f'--user-data-dir={os.path.expanduser("~")}/Library/Application Support/Google/Chrome/BagelOrder')
-chrome_options.add_experimental_option("detach", True)
+import contextlib
+import logging
 
-service = Service(executable_path=ChromeDriverManager().install())
+fh = logging.FileHandler('/tmp/logger.log')
+from selenium.webdriver.remote.remote_connection import LOGGER
+LOGGER.addHandler(fh)
+LOGGER.setLevel(logging.WARNING)
+with open('/tmp/error.txt', 'w') as log:
+    with contextlib.redirect_stderr(log):
+        with contextlib.redirect_stdout(log):
+            with open(os.path.join(APP_FOLDER, ORDER_FILE_NAME)) as order_file:
+                chrome_options = Options() 
+                chrome_options.add_argument(f'--user-data-dir={os.path.expanduser("~")}/Library/Application Support/Google/Chrome/BagelOrder')
+                chrome_options.add_experimental_option("detach", True)
 
-driver = webdriver.Chrome(service=service, options=chrome_options)
+                service = Service(executable_path=ChromeDriverManager().install())
 
-with open(ORDER_FILE_NAME) as order_file:
-    orders = json.load(order_file)
-    for order in orders:
-        run_order(driver, order)
+                driver = webdriver.Chrome(service=service, options=chrome_options)
+
+                orders = json.load(order_file)
+                for order in orders:
+                    run_order(driver, order)
 

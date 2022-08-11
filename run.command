@@ -7,6 +7,7 @@ else
     mkdir -p py-env
     python3 -m venv py-env
     . py-env/bin/activate
+    pip install --upgrade pip
     pip install selenium requests webdriver_manager
 fi
 

@@ -1,6 +1,8 @@
 [{
     "site": "https://www.doordash.com/store/bruegger's-bagels-durham-250810",
-    "address": "800 Taylor St STE 300, Durham, NC 27701",
+    "address": "123 Pavement St, Durham, NC 27707",
+    "day": "TMR",
+    "time": "8:30 - 8:50 AM",
     "items": [
       {
         "name": "Baker's Dozen",
